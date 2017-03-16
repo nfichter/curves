@@ -1,9 +1,6 @@
 from display import *
 from matrix import *
 from draw import *
-import math
-import time
-from random import randint
 
 """
 Goes through the file named filename and performs all of the actions listed in that file.
@@ -11,6 +8,13 @@ The file follows the following format:
      Every command is a single character that takes up a line
      Any command that requires arguments must have those arguments in the second line.
      The commands are as follows:
+	 circle: add a circle to the edge matrix - 
+	    takes 4 arguments (cx, cy, cz, r)
+	 hermite: add a hermite curve to the edge matrix -
+	    takes 8 arguments (x0, y0, x1, y1, rx0, ry0, rx1, ry1)
+	 bezier: add a bezier curve to the edge matrix -
+	    takes 8 arguments (x0, y0, x1, y1, x2, y2, x3, y3)
+
          line: add a line to the edge matrix - 
 	    takes 6 arguemnts (x0, y0, z0, x1, y1, z1)
 	 ident: set the transform matrix to the identity matrix - 
@@ -34,84 +38,70 @@ The file follows the following format:
 
 See the file script for an example of the file format
 """
+ARG_COMMANDS = [ 'line', 'scale', 'move', 'rotate', 'save', 'circle', 'hermite', 'bezier' ]
 
-#note, also added "color" which takes 3 args (r, g, b) from 0,255 or "random" for random
-#"displaynoclr" to display without clear_screen, "savenoclr"
-def parse_file( fname, points, transform, screen, color ):
-    lines = open(fname).readlines()
-    lineNum = 0
-    while lineNum < len(lines):
-    	add = 2
-    	cmd = lines[lineNum][:-1]
-    	print cmd
-    	if cmd == "line":
-    		args = lines[lineNum+1].split(" ")
-    		add_edge(points,int(args[0]),int(args[1]),int(args[2]),int(args[3]),int(args[4]),int(args[5]))
-    	elif cmd == "ident":
-    		add = 1
-    		ident(transform)
-    	elif cmd == "scale":
-    		args = lines[lineNum+1].split(" ")
-    		scale = make_scale(float(args[0]),float(args[1]),float(args[2]))
-    		matrix_mult(scale, transform)
-    	elif cmd == "move":
-    		args = lines[lineNum+1].split(" ")
-    		translate = make_translate(int(args[0]),int(args[1]),int(args[2]))
-    		matrix_mult(translate, transform)
-    	elif cmd == "rotate":
-    		args = lines[lineNum+1].split(" ")
-    		rotate = []
-    		rad = int(args[1]) * math.pi / 180.0
-    		if args[0] == "x":
-    			rotate = make_rotX(rad)
-    		if args[0] == "y":
-    			rotate = make_rotY(rad)
-    		if args[0] == "z":
-    			rotate = make_rotZ(rad)
-    		matrix_mult(rotate, transform)
-    	elif cmd == "color":
-    		args = lines[lineNum+1].split(" ")
-    		print args[0]
-    		if args[0] == "random":
-    			color[0] = randint(0,256)
-    		else:
-	    		color[0] = int(args[0])
-	    	if args[1] == "random":
-	    		color[1] = randint(0,256)
-	    	else:
-    			color[1] = int(args[1])
-    		if args[2] == "random\n":
-	    		color[2] = randint(0,256)
-	    	else:
-	    		color[2] = int(args[2])
-    	elif cmd == "apply":
-    		add = 1
-    		matrix_mult(transform, points)
-    		for i in range(0,len(points)):
-    			for j in range(0,len(points[0])):
-    				points[i][j] = int(points[i][j])
-    	elif cmd == "display":
-    		add = 1
-    		clear_screen(screen)
-    		draw_lines( points, screen, color )
-    		time.sleep(0.1)
-    		display(screen)
-    	elif cmd == "displaynoclr":
-    		add = 1
-    		draw_lines( points, screen, color )
-    		time.sleep(0.1)
-    		display(screen)
-    	elif cmd == "save":
-    		args = str(lines[lineNum+1])
-    		clear_screen(screen)
-    		draw_lines( points, screen, color )
-    		time.sleep(0.1)
-    		save_extension(screen,args)
-    	elif cmd == "savenoclr":
-    		args = str(lines[lineNum+1])
-    		draw_lines( points, screen, color )
-    		time.sleep(0.1)
-    		save_extension(screen,args)
-    	elif cmd == "quit":
-    		break
-    	lineNum += add
+def parse_file( fname, edges, transform, screen, color ):
+
+    f = open(fname)
+    lines = f.readlines()
+
+    c = 0
+    while c < len(lines):
+        line = lines[c].strip()
+        #print ':' + line + ':'
+
+        if line in ARG_COMMANDS:
+            c+= 1
+            args = lines[c].strip().split(' ')
+
+        if line == 'line':            
+            #print 'LINE\t' + str(args)
+
+            add_edge( edges,
+                      float(args[0]), float(args[1]), float(args[2]),
+                      float(args[3]), float(args[4]), float(args[5]) )
+
+        elif line == 'scale':
+            #print 'SCALE\t' + str(args)
+            t = make_scale(float(args[0]), float(args[1]), float(args[2]))
+            matrix_mult(t, transform)
+
+        elif line == 'move':
+            #print 'MOVE\t' + str(args)
+            t = make_translate(float(args[0]), float(args[1]), float(args[2]))
+            matrix_mult(t, transform)
+
+        elif line == 'rotate':
+            #print 'ROTATE\t' + str(args)
+            theta = float(args[1]) * (math.pi / 180)
+            
+            if args[0] == 'x':
+                t = make_rotX(theta)
+            elif args[0] == 'y':
+                t = make_rotY(theta)
+            else:
+                t = make_rotZ(theta)
+            matrix_mult(t, transform)
+                
+        elif line == 'ident':
+        	ident(transform)
+        	
+        elif line == 'circle':
+            add_circle(edges,float(args[0]),float(args[1]),float(args[2]),float(args[3]),0.0314)
+
+        elif line == 'hermite' or line == 'bezier':
+            add_curve(edges,float(args[0]),float(args[1]),float(args[2]),float(args[3]),float(args[4]),float(args[5]),float(args[6]),float(args[7]),0.01,line)
+
+        elif line == 'apply':
+            matrix_mult( transform, edges )
+
+        elif line == 'display' or line == 'save':
+            clear_screen(screen)
+            draw_lines(edges, screen, color)
+
+            if line == 'display':
+                display(screen)
+            else:
+                save_extension(screen, args[0])
+            
+        c+= 1

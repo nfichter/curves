@@ -1,47 +1,87 @@
 import math
 
-def make_translate( x, y, z ):
+def make_bezier():
     ret = new_matrix()
-    ident(ret)
-    ret[3][0] = x
-    ret[3][1] = y
-    ret[3][2] = z
+    ret[0][0] = -1
+    ret[0][1] = 3
+    ret[0][2] = -3
+    ret[0][3] = 1
+    ret[1][0] = 3
+    ret[1][1] = -6
+    ret[1][2] = -3
+    ret[2][0] = -3
+    ret[2][1] = 3
+    ret[3][0] = 1
     return ret
+
+def make_hermite():
+	ret = new_matrix()
+	ret[0][0] = 2
+	ret[0][1] = -2
+	ret[0][2] = 1
+	ret[0][3] = 1
+	ret[1][0] = -3
+	ret[1][1] = 3
+	ret[1][2] = -2
+	ret[1][3] = 1
+	ret[2][2] = 1
+	ret[3][0] = 1
+	return ret
+
+def generate_curve_coefs( p1, p2, p3, p4, type ):
+    coefs = new_matrix(4,1)
+    coefs[0][0] = p1
+    coefs[0][1] = p2
+    coefs[0][2] = p3
+    coefs[0][3] = p4
+    if type == "hermite":
+    	matrix_mult(make_hermite(),coefs)
+    else:
+    	matrix_mult(make_bezier(),coefs)
+    return coefs
+
+def make_translate( x, y, z ):
+    t = new_matrix()
+    ident(t)
+    t[3][0] = x
+    t[3][1] = y
+    t[3][2] = z
+    return t
 
 def make_scale( x, y, z ):
-	ret = new_matrix()
-	ident(ret)
-	ret[0][0] = x
-	ret[1][1] = y
-	ret[2][2] = z
-	return ret
+    t = new_matrix()
+    ident(t)
+    t[0][0] = x
+    t[1][1] = y
+    t[2][2] = z
+    return t
 
-def make_rotX( theta ):    
-    ret = new_matrix()
-    ident(ret)
-    ret[1][1] = math.cos(theta)
-    ret[2][1] = -1*math.sin(theta)
-    ret[1][2] = math.sin(theta)
-    ret[2][2] = math.cos(theta)
-    return ret
+def make_rotX( theta ):
+    t = new_matrix()
+    ident(t)
+    t[1][1] = math.cos(theta)
+    t[2][1] = -1 * math.sin(theta)
+    t[1][2] = math.sin(theta)
+    t[2][2] = math.cos(theta)
+    return t
 
 def make_rotY( theta ):
-	ret = new_matrix()
-	ident(ret)
-	ret[0][0] = math.cos(theta)
-	ret[2][0] = math.sin(theta)
-	ret[0][2] = math.sin(theta)
-	ret[2][2] = -1*math.cos(theta)
-	return ret
+    t = new_matrix()
+    ident(t)
+    t[0][0] = math.cos(theta)
+    t[0][2] = -1 * math.sin(theta)
+    t[2][0] = math.sin(theta)
+    t[2][2] = math.cos(theta)
+    return t
 
 def make_rotZ( theta ):
-    ret = new_matrix()
-    ident(ret)
-    ret[0][0] = math.cos(theta)
-    ret[1][0] = -1*math.sin(theta)
-    ret[0][1] = math.sin(theta)
-    ret[1][1] = math.cos(theta)
-    return ret
+    t = new_matrix()
+    ident(t)
+    t[0][0] = math.cos(theta)
+    t[1][0] = -1 * math.sin(theta)
+    t[0][1] = math.sin(theta)
+    t[1][1] = math.cos(theta)
+    return t
 
 def print_matrix( matrix ):
     s = ''
@@ -58,7 +98,6 @@ def ident( matrix ):
                 matrix[c][r] = 1
             else:
                 matrix[c][r] = 0
-    
 
 def scalar_mult( matrix, s ):
     for r in range( len( matrix[0] ) ):
