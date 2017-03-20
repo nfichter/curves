@@ -35,17 +35,9 @@ def generate_curve_coefs( p1, p2, p3, p4, type ):
     coefs[0][2] = p3
     coefs[0][3] = p4
     if type == "hermite":
-    	print "before"
-    	print_matrix(coefs)
     	matrix_mult(make_hermite(),coefs)
-    	print "after"
-    	print_matrix(coefs)
     else:
-    	print "before"
-    	print_matrix(coefs)
     	matrix_mult(make_bezier(),coefs)
-    	print "after"
-    	print_matrix(coefs)
     return coefs
 
 def make_translate( x, y, z ):
