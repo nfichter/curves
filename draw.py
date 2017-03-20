@@ -1,6 +1,6 @@
 from display import *
 from matrix import *
-
+import random
 
 def add_circle( points, cx, cy, cz, r, step ):
 	t = 0
@@ -57,6 +57,7 @@ def add_point( matrix, x, y, z=0 ):
 
 
 def draw_line( x0, y0, x1, y1, screen, color ):
+    color = [random.randint(0,256),random.randint(0,256),random.randint(0,256)]
 
     #swap points if going right -> left
     if x0 > x1:
