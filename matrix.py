@@ -8,24 +8,28 @@ def make_bezier():
     ret[0][3] = 1
     ret[1][0] = 3
     ret[1][1] = -6
-    ret[1][2] = -3
+    ret[1][2] = 3
     ret[2][0] = -3
     ret[2][1] = 3
     ret[3][0] = 1
+    print "bez"
+    print_matrix(ret)
     return ret
 
 def make_hermite():
 	ret = new_matrix()
 	ret[0][0] = 2
-	ret[0][1] = -2
-	ret[0][2] = 1
-	ret[0][3] = 1
-	ret[1][0] = -3
-	ret[1][1] = 3
-	ret[1][2] = -2
-	ret[1][3] = 1
-	ret[2][2] = 1
+	ret[1][0] = -2
+	ret[2][0] = 1
 	ret[3][0] = 1
+	ret[0][1] = -3
+	ret[1][1] = 3
+	ret[2][1] = -2
+	ret[3][1] = -1
+	ret[2][2] = 1
+	ret[0][3] = 1
+	print "her"
+	print_matrix(ret)
 	return ret
 
 def generate_curve_coefs( p1, p2, p3, p4, type ):
@@ -35,9 +39,17 @@ def generate_curve_coefs( p1, p2, p3, p4, type ):
     coefs[0][2] = p3
     coefs[0][3] = p4
     if type == "hermite":
+    	print "before"
+    	print_matrix(coefs)
     	matrix_mult(make_hermite(),coefs)
+    	print "after"
+    	print_matrix(coefs)
     else:
+    	print "before"
+    	print_matrix(coefs)
     	matrix_mult(make_bezier(),coefs)
+    	print "after"
+    	print_matrix(coefs)
     return coefs
 
 def make_translate( x, y, z ):
