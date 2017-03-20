@@ -12,8 +12,6 @@ def make_bezier():
     ret[2][0] = -3
     ret[2][1] = 3
     ret[3][0] = 1
-    print "bez"
-    print_matrix(ret)
     return ret
 
 def make_hermite():
@@ -28,8 +26,6 @@ def make_hermite():
 	ret[3][1] = -1
 	ret[2][2] = 1
 	ret[0][3] = 1
-	print "her"
-	print_matrix(ret)
 	return ret
 
 def generate_curve_coefs( p1, p2, p3, p4, type ):

@@ -22,10 +22,6 @@ def add_curve( points, x0, y0, x1, y1, x2, y2, x3, y3, step, curve_type ):
     	coefs_x = generate_curve_coefs(x0,x1,x2,x3,"bezier")
     	coefs_y = generate_curve_coefs(y0,y1,y2,y3,"bezier")
     t = 0
-    print "coefs x"
-    print_matrix(coefs_x)
-    print "coefs y"
-    print_matrix(coefs_y)
     while t < 1.00001:
     	x0n = coefs_x[0][0]*math.pow(t,3) + coefs_x[0][1]*math.pow(t,2) + coefs_x[0][2]*t + coefs_x[0][3]
     	y0n = coefs_y[0][0]*math.pow(t,3) + coefs_y[0][1]*math.pow(t,2) + coefs_y[0][2]*t + coefs_y[0][3]
